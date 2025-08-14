@@ -8,7 +8,7 @@ class Product extends Model
 {
     protected $fillable = [
         'category_id',
-        'product_parent_id',
+        'product_group_id',
         'title',
         'description',
         'content',

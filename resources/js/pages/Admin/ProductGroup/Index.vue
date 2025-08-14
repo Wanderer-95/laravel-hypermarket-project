@@ -4,21 +4,21 @@ import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { httpRequest } from '@/helpers/http';
-import { Param } from '@/pages/Admin/Param/Types';
-
-const props = defineProps<{
-    params: Param[];
-}>();
+import { ProductGroup } from '@/pages/Admin/ProductGroup/Types';
 
 const isSuccess = ref(false);
 
-const paramsData = ref<Param[]>(props.params);
+const props = defineProps<{
+    productGroups: ProductGroup[];
+}>();
 
-async function deleteParam(param: Param) {
+const productGroupsData = ref<ProductGroup[]>(props.productGroups);
+
+async function deleteProductGroup(productGroup: ProductGroup) {
     isSuccess.value = true;
-    await httpRequest(route('admin.params.destroy', param.id), 'DELETE');
+    await httpRequest(route('admin.product-groups.destroy', productGroup.id), 'DELETE');
+    productGroupsData.value = productGroupsData.value.filter((productGroupData) => productGroupData.id !== productGroup.id);
     setTimeout(() => isSuccess.value = false, 3000);
-    paramsData.value = paramsData.value.filter((paramData) => paramData.id !== param.id);
 }
 
 </script>
@@ -27,30 +27,26 @@ async function deleteParam(param: Param) {
 
     <AdminLayout>
         <div v-if="isSuccess" class="p-4 bg-green-100 mb-4">
-            Параметр успешно удален!
+            Группа продуктов удалена!
         </div>
         <table class="mb-4 min-w-full divide-y divide-gray-200 border border-gray-300">
             <thead class="bg-gray-100">
             <tr>
                 <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">ID</th>
                 <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Заголовок</th>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Тип фильтра</th>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Заголовок типа фильтра</th>
                 <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Действия</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
-            <tr class="hover:bg-gray-50" :key="param.id" v-for="param in paramsData">
-                <td class="px-4 py-2 text-sm text-gray-900">{{ param.id }}</td>
+            <tr class="hover:bg-gray-50" :key="productGroup.id" v-for="productGroup in productGroupsData">
+                <td class="px-4 py-2 text-sm text-gray-900">{{ productGroup.id }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900">
-                    <Link :href="route('admin.params.show', param.id)">
-                        {{ param.title }}
+                    <Link :href="route('admin.product-groups.show', productGroup.id)">
+                        {{ productGroup.title }}
                     </Link>
                 </td>
-                <td class="px-4 py-2 text-sm text-gray-900">{{ param.filter_type }}</td>
-                <td class="px-4 py-2 text-sm text-gray-900">{{ param.filter_type_title }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 flex items-center gap-3">
-                    <Link :href="route('admin.params.edit', param.id)">
+                    <Link :href="route('admin.product-groups.edit', productGroup.id)">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -66,7 +62,7 @@ async function deleteParam(param: Param) {
                             />
                         </svg>
                     </Link>
-                    <button @click.prevent="deleteParam(param)" class="text-red-600 hover:text-red-800 cursor-pointer">
+                    <button @click.prevent="deleteProductGroup(productGroup)" class="text-red-600 hover:text-red-800 cursor-pointer">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -89,7 +85,7 @@ async function deleteParam(param: Param) {
 
         <div>
             <Link
-                :href="route('admin.params.create')"
+                :href="route('admin.product-groups.create')"
                 class="inline-block rounded bg-blue-600 px-4 py-2 font-semibold text-white shadow transition duration-300 hover:bg-blue-700"
             >
                 Добавить

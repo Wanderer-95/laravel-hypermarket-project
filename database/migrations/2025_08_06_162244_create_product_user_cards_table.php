@@ -27,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_user_cards');
+        if (! app()->isProduction()) {
+            Schema::dropIfExists('product_user_cards');
+        }
     }
 };

@@ -24,6 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_user');
+        if (! app()->isProduction()) {
+            Schema::dropIfExists('role_user');
+        }
     }
 };

@@ -25,7 +25,7 @@ import { Link } from '@inertiajs/vue3';
                 </Link>
 
                 <Link
-                    :href="route('admin.product-parents.index')"
+                    :href="route('admin.product-groups.index')"
                     class="relative block p-4 text-gray-300 border-b border-gray-700 hover:text-white transition-colors duration-300 ease-in-out group"
                 >
                     Группа продуктов

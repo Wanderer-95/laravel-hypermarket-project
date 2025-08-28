@@ -10,6 +10,16 @@ export interface Product {
     qty: number;
     created_at: string;
     updated_at: string;
+    article: string;
+    images: {
+        id: number;
+        url: string;
+    },
+    params: {
+        id: number;
+        title: string;
+        value: string;
+    }
 }
 
 

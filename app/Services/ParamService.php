@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Param;
+use App\Models\Product;
 
 class ParamService
 {
@@ -16,5 +17,10 @@ class ParamService
         $param->update($data);
 
         return $param->fresh();
+    }
+
+    public static function attachBatchParams(Product $product, array $params): void
+    {
+        $product->params()->attach($params);
     }
 }

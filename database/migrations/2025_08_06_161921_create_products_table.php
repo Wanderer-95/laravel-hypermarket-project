@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_group_id')->index()->constrained('product_groups');
             $table->foreignId('category_id')->index()->constrained('categories');
+            $table->unsignedBigInteger('article')->unique();
+            $table->foreignId('parent_id')->nullable()->index()->constrained('products');
             $table->string('title');
             $table->text('description');
             $table->text('content');

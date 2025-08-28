@@ -6,6 +6,7 @@ enum ParamTypeFilterEnum: int
 {
     case INTEGER = 1;
     case SELECT = 2;
+    case CHECKBOX = 3;
 
     public static function names(): array
     {

@@ -2,11 +2,12 @@
 
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { ProductGroup } from '@/pages/Admin/ProductGroup/Types';
+import { Product } from '@/pages/Admin/Product/Types';
 
 defineProps<{
-    productGroup: ProductGroup;
+    product: Product;
 }>();
+
 
 </script>
 
@@ -21,15 +22,22 @@ defineProps<{
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
             <tr class="hover:bg-gray-50">
-                <td class="px-4 py-2 text-sm text-gray-900">{{ productGroup.id }}</td>
-                <td class="px-4 py-2 text-sm text-gray-900">{{ productGroup.title }}</td>
+                <td class="px-4 py-2 text-sm text-gray-900">{{ product.id }}</td>
+                <td class="px-4 py-2 text-sm text-gray-900">{{ product.title }}</td>
             </tr>
             </tbody>
         </table>
+        <div class="mb-4">
+            <div class="flex items-center gap-4">
+                <div v-for="image in product.images" :key="image.id">
+                    <img :src="image.url" :alt="product.title">
+                </div>
+            </div>
+        </div>
 
         <div>
             <Link
-                :href="route('admin.product-groups.index')"
+                :href="route('admin.products.index')"
                 class="inline-block rounded bg-blue-600 px-4 py-2 font-semibold text-white shadow transition duration-300 hover:bg-blue-700"
             >
                 Назад

@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Product\StoreRequest;
 use App\Http\Requests\Admin\Product\UpdateRequest;
 use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\Param\ParamResource;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\ProductGroup\ProductGroupResource;
 use App\Models\Category;
+use App\Models\Image;
+use App\Models\Param;
 use App\Models\Product;
 use App\Models\ProductGroup;
 use App\Services\ProductService;
@@ -21,8 +24,16 @@ class ProductController extends Controller
 {
     public function index(): Response
     {
-        $products = Product::all();
-        $products = ProductResource::collection($products)->resolve();
+        $products = Product::with('images')->get();
+
+        $resources = ProductResource::collection($products);
+
+        // применяем withRelations к каждому ресурсу
+        foreach ($resources as $resource) {
+            $resource->withRelations(['images']);
+        }
+
+        $products = $resources->resolve();
 
         return Inertia::render('Admin/Product/Index', compact('products'));
     }
@@ -31,7 +42,8 @@ class ProductController extends Controller
     {
         $categories = CategoryResource::collection(Category::all())->resolve();
         $productGroups = ProductGroupResource::collection(ProductGroup::all())->resolve();
-        return Inertia::render('Admin/Product/Create', compact('categories', 'productGroups'));
+        $params = ParamResource::collection(Param::all())->resolve();
+        return Inertia::render('Admin/Product/Create', compact('categories', 'productGroups', 'params'));
     }
 
     public function store(StoreRequest $request): array
@@ -44,31 +56,42 @@ class ProductController extends Controller
 
     public function show(Product $product): Response
     {
-        $product = ProductResource::make($product)->resolve();
-
+        $product = $this->loadImages($product);
         return Inertia::render('Admin/Product/Show', compact('product'));
     }
 
     public function edit(Product $product): Response
     {
-        $product = ProductResource::make($product)->resolve();
+        $product->load(['params', 'images']);
+        $product = ProductResource::make($product)->withRelations(['images', 'params'])->resolve();
         $categories = CategoryResource::collection(Category::all())->resolve();
         $productGroups = ProductGroupResource::collection(ProductGroup::all())->resolve();
-        return Inertia::render('Admin/Product/Edit', compact('product', 'categories', 'productGroups'));
+        $params = ParamResource::collection(Param::all())->resolve();
+        return Inertia::render('Admin/Product/Edit', compact('product', 'categories', 'productGroups', 'params'));
     }
 
     public function update(UpdateRequest $request, Product $product): array
     {
         $data = $request->validated();
         $product = ProductService::update($product, $data);
-
-        return ProductResource::make($product)->resolve();
+        return $this->loadImages($product);
     }
 
     public function destroy(Product $product): JsonResponse
     {
         $product->delete();
-
         return response()->json(['message' => 'success'], HttpResponse::HTTP_OK);
+    }
+
+    public function productImage(Image $image): JsonResponse
+    {
+        $image->delete();
+        return response()->json(['message' => 'success'], HttpResponse::HTTP_OK);
+    }
+
+    private function loadImages(Product $product): array
+    {
+        $product->load('images');
+        return ProductResource::make($product)->withRelations(['images'])->resolve();
     }
 }

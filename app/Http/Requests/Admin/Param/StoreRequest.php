@@ -24,7 +24,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'filter_type' => 'required|integer|in:'.ParamTypeFilterEnum::valuesAsString().'|between:1,2'
+            'filter_type' => 'required|integer|in:'.ParamTypeFilterEnum::valuesAsString().'|between:1,3'
         ];
     }
 }

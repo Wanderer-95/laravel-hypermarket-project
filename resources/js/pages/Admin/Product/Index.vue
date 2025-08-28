@@ -17,6 +17,7 @@ async function deleteProduct(product: Product) {
     productsData.value = productsData.value.filter((productData) => productData.id !== product.id);
 }
 
+console.log(props.products);
 </script>
 
 <template>

@@ -2,34 +2,41 @@ export async function httpRequest<T = any>(
     url: string,
     method: string,
     data?: any,
-    headers: HeadersInit = {}
+    headers: Record<string, string> = {}
 ): Promise<T> {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    const combinedHeaders: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...headers,
-    };
+    const combinedHeaders: Record<string, string> = { ...headers };
 
     if (csrfToken) {
-        (combinedHeaders as Record<string, string>)['X-CSRF-TOKEN'] = csrfToken;
+        combinedHeaders['X-CSRF-TOKEN'] = csrfToken;
     }
 
-    const body = data ? JSON.stringify(data) : undefined;
+    let body: BodyInit | undefined;
+
+    if (data instanceof FormData) {
+        body = data;
+        // Не ставим Content-Type, fetch сам выставит multipart/form-data
+    } else if (data) {
+        combinedHeaders['Content-Type'] = 'application/json';
+        body = JSON.stringify(data);
+    }
 
     const response = await fetch(url, {
         method,
         headers: combinedHeaders,
-        body,
+        body
     });
 
-    const responseText = await response.text();
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
     }
 
-    try {
-        return JSON.parse(responseText);
-    } catch (e) {
-        throw e;
+    // Пытаемся распарсить как JSON, иначе возвращаем текст
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+        return await response.json();
+    } else {
+        return (await response.text()) as unknown as T;
     }
 }

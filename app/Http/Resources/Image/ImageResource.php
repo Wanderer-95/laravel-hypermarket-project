@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\ProductGroup;
+namespace App\Http\Resources\Image;
 
 use App\Http\Resources\BaseJsonResource;
 use Illuminate\Http\Request;
 
-class ProductGroupResource extends BaseJsonResource
+class ImageResource extends BaseJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,6 +14,10 @@ class ProductGroupResource extends BaseJsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'url' => $this->url
+        ];
     }
 }

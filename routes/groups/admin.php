@@ -13,4 +13,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', IsAdminMiddleware::c
     Route::resource('products', ProductController::class);
     Route::resource('params', ParamController::class);
     Route::resource('product-groups', ProductGroupController::class)->parameters(['product-groups' => 'productGroup']);
+    Route::delete('/product-image/{image}', [ProductController::class, 'productImage'])->name('product.image.destroy');
 });

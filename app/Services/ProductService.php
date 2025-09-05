@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Product;
+use Illuminate\Support\Arr;
+
+class ProductService
+{
+    public static function store(array $data): Product
+    {
+        $product = Product::query()->create(Arr::get($data, 'product'));
+        ProductService::storeImages($product, Arr::get($data, 'images'));
+        self::storeProductParam($product, Arr::get($data, 'params'));
+        return $product;
+    }
+
+    public static function update(Product $product, array $data): Product
+    {
+        ProductService::storeImages($product, Arr::get($data, 'images'));
+        ProductService::syncBatchParams($product, $data);
+        $product->update(Arr::get($data, 'product'));
+
+        return $product->fresh();
+    }
+
+    public static function storeProductParam(Product $product, array $data): void
+    {
+        if (isset($data)) {
+            foreach ($data as $param) {
+                $product->params()->attach($param['param_id'], [
+                    'value' => $param['value']
+                ]);
+            }
+        }
+    }
+
+    public static function syncBatchParams(Product $product, array $data): void
+    {
+        $product->params()->detach();
+        ParamService::attachBatchParams($product, $data['params']);
+    }
+
+    private static function storeImages(Product $product, ?array $images = null): void
+    {
+        if (isset($images)) {
+            ImageService::storeBatch($product, $images);
+        }
+    }
+}

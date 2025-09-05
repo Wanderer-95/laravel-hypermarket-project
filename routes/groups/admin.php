@@ -1,0 +1,18 @@
+<?php
+
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ParamController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductGroupController;
+use App\Http\Middleware\IsAdminMiddleware;
+
+Route::get('dashboard', DashboardController::class)->prefix('admin')->name('dashboard')->middleware(['auth', IsAdminMiddleware::class]);
+Route::prefix('admin')->name('admin.')->middleware(['auth', IsAdminMiddleware::class])->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('params', ParamController::class);
+    Route::resource('product-groups', ProductGroupController::class)->parameters(['product-groups' => 'productGroup']);
+    Route::get('/products/{product}/child/create', [ProductController::class, 'createChild'])->name('products.child.createChild');
+    Route::delete('/product-image/{image}', [ProductController::class, 'productImage'])->name('product.image.destroy');
+});

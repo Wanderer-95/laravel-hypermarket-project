@@ -38,6 +38,11 @@ class ProductController extends Controller
         return Inertia::render('Admin/Product/Index', compact('products'));
     }
 
+    public function indexChild(Product $product)
+    {
+        return ProductResource::collection($product->children)->resolve();
+    }
+
     public function create(): Response
     {
         $categories = CategoryResource::collection(Category::all())->resolve();

@@ -21,6 +21,7 @@ class ProductResource extends BaseJsonResource
             'id' => $this->id,
             'article' => $this->article,
             'product_group_id' => $this->product_group_id,
+            'parent_id' => $this->parent_id,
             'category_id' => $this->category_id,
             'title' => $this->title,
             'description' => $this->description,

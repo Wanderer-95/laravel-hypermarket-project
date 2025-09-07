@@ -24,7 +24,7 @@ class ProductService
         return $product->fresh();
     }
 
-    public static function storeProductParam(Product $product, array $data): void
+    public static function storeProductParam(Product $product, ?array $data = null): void
     {
         if (isset($data)) {
             foreach ($data as $param) {

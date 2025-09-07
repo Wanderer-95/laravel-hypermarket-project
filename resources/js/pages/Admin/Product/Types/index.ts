@@ -15,6 +15,7 @@ export interface Product {
     price: number;
     old_price: number;
     category_id: number;
+    parent_id: number;
     description: string;
     content: string;
     product_group_id: number;
@@ -24,4 +25,5 @@ export interface Product {
     article: string;
     images: ProductImage[];      // ✅ массив изображений
     params: ProductParam[];      // ✅ массив параметров
+    productsChildData?: Product[] | null;
 }

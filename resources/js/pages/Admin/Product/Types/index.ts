@@ -25,5 +25,6 @@ export interface Product {
     article: string;
     images: ProductImage[];      // ✅ массив изображений
     params: ProductParam[];      // ✅ массив параметров
+    preview_url: string;      // ✅ массив параметров
     productsChildData?: Product[] | null;
 }

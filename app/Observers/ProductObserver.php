@@ -28,12 +28,15 @@ class ProductObserver
      */
     public function deleting(Product $product): void
     {
+        $product->load(['children', 'images']);
         foreach ($product->images as $image) {
             Storage::delete($image->path);
             $image->delete();
         }
         $product->params()->detach();
-        $product->children()->delete();
+        foreach ($product->children as $child) {
+            $child->delete();
+        }
     }
 
     /**

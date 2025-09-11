@@ -32,6 +32,7 @@ class ProductResource extends BaseJsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'images' => $this->relationLoadedOrEmpty('images', ImageResource::class),
+            'preview_url' => $this->preview_url,
             'params' => $this->relationLoadedOrEmpty('params', ParamWithPivotResource::class),
         ];
     }

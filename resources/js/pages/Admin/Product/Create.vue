@@ -28,6 +28,8 @@ const paramOption = ref<ParamOption>({
     value: '',
 });
 
+const errors = ref(null);
+
 const productForm = useForm({
     product: {
         product_group_id: null as number | null,
@@ -120,7 +122,8 @@ async function storeProduct() {
         productForm.reset();
         paramsData.value = [];
     } catch (err) {
-        console.error(err);
+        errors.value = err.errors;
+        console.log(errors.value);
     }
 }
 
@@ -139,6 +142,9 @@ async function storeProduct() {
                     placeholder="Введите название"
                     class="w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
+                <div v-if="errors?.['product.title']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.title'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="article">Артикль</label>
@@ -149,6 +155,9 @@ async function storeProduct() {
                     placeholder="Введите артикль"
                     class="w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
+                <div v-if="errors?.['product.article']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.article'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="description">Описание</label>
@@ -159,6 +168,9 @@ async function storeProduct() {
                     rows="3"
                     class="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 shadow-sm transition focus:border-transparent focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 ></textarea>
+                <div v-if="errors?.['product.description']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.description'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="content">Контент</label>
@@ -169,6 +181,9 @@ async function storeProduct() {
                     rows="6"
                     class="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 shadow-sm transition focus:border-transparent focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 ></textarea>
+                <div v-if="errors?.['product.content']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.content'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="categoryId">Выберите категорию</label>
@@ -182,6 +197,9 @@ async function storeProduct() {
                     </option>
                     <option :value="category.id" :key="category.id" v-for="category in categories">{{ category.title }}</option>
                 </select>
+                <div v-if="errors?.['product.category_id']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.category_id'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="productGroupId">Выберите группу продуктов</label>
@@ -195,6 +213,9 @@ async function storeProduct() {
                     </option>
                     <option :value="productGroup.id" :key="productGroup.id" v-for="productGroup in productGroups">{{ productGroup.title }}</option>
                 </select>
+                <div v-if="errors?.['product.product_group_id']" class="mt-1 text-sm text-red-600">
+                    {{ errors['product.product_group_id'][0] }}
+                </div>
             </div>
             <div>
                 <label class="mb-2 block text-gray-600" for="file">Выберите изображения</label>

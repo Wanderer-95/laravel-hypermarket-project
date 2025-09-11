@@ -4,9 +4,13 @@ namespace App\Models;
 
 use App\Observers\ProductObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 #[ObservedBy([ProductObserver::class])]
 class Product extends Model
@@ -37,5 +41,21 @@ class Product extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Product::class, 'parent_id', 'id');
+    }
+
+    public function previewUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->images()->first()->url ?? null
+        );
+    }
+
+    /**
+     * Scope a query to only include popular users.
+     */
+    #[Scope]
+    protected function byCategories(Builder $query, Collection $categoryChildrenIds): Builder
+    {
+        return $query->whereIn('category_id', $categoryChildrenIds)->with('images')->whereNull('parent_id');
     }
 }

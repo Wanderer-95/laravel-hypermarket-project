@@ -4,17 +4,19 @@ import { Product } from '@/pages/Admin/Product/Types';
 import MainLayout from '@/layouts/MainLayout.vue';
 import ProductItem from '@/components/Client/Product/ProductItem.vue';
 import { Category } from '@/pages/Admin/Category/Types';
+import { Param } from '@/pages/Admin/Param/Types';
 
 defineProps<{
     products: Product[];
     breadcrumbs: Category[];
     category: Category;
+    params: Param[];
 }>();
 
 </script>
 
 <template>
-
+{{ console.log(products, params) }}
     <MainLayout>
         <aside class="w-1/4 bg-gray-800 min-h-screen">
             <nav class="bg-gray-800 rounded-lg overflow-hidden">

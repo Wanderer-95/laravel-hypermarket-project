@@ -62,6 +62,7 @@ const paramOption = ref<ParamOption>({
 });
 
 const paramsData = ref<ProductParam[] | null>(props.product.params);
+
 function removeParam(entriParam: ProductParam) {
     paramsData.value = paramsData.value?.filter((param) => param.param_id !== entriParam.param_id);
 }

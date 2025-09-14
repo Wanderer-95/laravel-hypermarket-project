@@ -27,6 +27,7 @@ class CategoryService
         $category->load('categories');
 
         foreach ($category->categories as $categoryChild) {
+            $categoryChild->load('paramProducts');
             $collection = $collection->merge(self::getCategoryChildren($categoryChild));
         }
 

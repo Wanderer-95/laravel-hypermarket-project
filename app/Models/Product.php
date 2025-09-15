@@ -56,6 +56,11 @@ class Product extends Model
     #[Scope]
     protected function byCategories(Builder $query, Collection $categoryChildrenIds): Builder
     {
-        return $query->whereIn('category_id', $categoryChildrenIds)->with('images')->whereNull('parent_id');
+        return $query->whereIn('category_id', $categoryChildrenIds)->with('images')->whereNotNull('parent_id');
+    }
+
+    public function paramProducts(): HasMany
+    {
+        return $this->hasMany(ParamProduct::class, 'product_id', 'id');
     }
 }

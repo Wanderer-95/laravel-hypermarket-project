@@ -3,38 +3,44 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\Category\ProductIndexRequest;
 use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Param\ParamWithValuesResource;
 use App\Http\Resources\Product\ProductResource;
 use App\Models\Category;
-use App\Models\Param;
 use App\Models\Product;
 use App\Services\CategoryService;
 use App\Services\ParamService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use App\Services\ProductService;
+use Illuminate\Database\Eloquent\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CategoryController extends Controller
 {
-    public function productsIndex(Category $category): Response
+    public function productsIndex(Category $category, ProductIndexRequest $request): Response|Collection|array
     {
-        $categoryChildrenIds = CategoryService::getCategoryChildren($category);
+        $data = $request->validated();
 
-        $params = ParamWithValuesResource::collection(ParamService::indexByCategories($categoryChildrenIds))->resolve();
-        $products = Product::byCategories($categoryChildrenIds->pluck('id'))->get();
-        $breadcrumbs = CategoryResource::collection(CategoryService::getCategoryParents($category)->reverse())->resolve();
-        $resources = ProductResource::collection($products);
-        $category = CategoryResource::make($category)->resolve();
+        $categoryChildrenIds = CategoryService::getCategoryChildren($category);
+        $resources = ProductResource::collection(ProductService::indexByCategories($categoryChildrenIds, $data));
 
         // применяем withRelations к каждому ресурсу
+
         foreach ($resources as $resource) {
             $resource->withRelations(['images']);
         }
 
         $products = $resources->resolve();
+
+        if ($request->wantsJson())
+        {
+            return $products;
+        }
+
+        $params = ParamWithValuesResource::collection(ParamService::indexByCategories($categoryChildrenIds))->resolve();
+        $breadcrumbs = CategoryResource::collection(CategoryService::getCategoryParents($category)->reverse())->resolve();
+        $category = CategoryResource::make($category)->resolve();
 
         return Inertia::render('Client/Category/ProductIndex', compact('category', 'products', 'breadcrumbs', 'params'));
     }

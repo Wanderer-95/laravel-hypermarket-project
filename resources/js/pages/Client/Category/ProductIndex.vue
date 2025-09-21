@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import { Product } from '@/pages/Admin/Product/Types';
 import MainLayout from '@/layouts/MainLayout.vue';
 import ProductItem from '@/components/Client/Product/ProductItem.vue';
@@ -6,6 +7,8 @@ import { Category } from '@/pages/Admin/Category/Types';
 import { Param } from '@/pages/Admin/Param/Types';
 import { ref } from 'vue';
 import { httpRequest } from '@/helpers/http';
+import { Link } from '@inertiajs/vue3';
+import Breadcrumb from '@/components/Client/Category/Breadcrumb.vue';
 
 const props = defineProps<{
     products: Product[];
@@ -65,7 +68,11 @@ async function getPosts() {
     try {
         cleanInteger(filters.value.integer.from);
         cleanInteger(filters.value.integer.to);
-        productsData.value = await httpRequest(route('client.categories.products.index', props.category.id), 'GET', { filters: filters.value });
+        productsData.value = await httpRequest(route('client.categories.products.index', props.category.id), 'GET', {
+            integer: filters.value.integer,
+            select: filters.value.select,
+            checkbox: filters.value.checkbox,
+        });
     } catch (err) {
         console.log(err, 22);
     }
@@ -74,6 +81,7 @@ async function getPosts() {
 
 <template>
     <MainLayout>
+        {{ filters }}
         <aside class="min-h-screen w-1/4 bg-gray-900 p-6">
             <nav class="space-y-6 rounded-xl bg-gray-800 p-4">
                 <template v-for="param in params">
@@ -91,7 +99,8 @@ async function getPosts() {
                                     :id="value"
                                     class="form-checkbox text-indigo-600 focus:ring-indigo-500"
                                 />
-                                <label :for="value" class="text-gray-300">{{ value }}</label>
+                                <label v-if="param.label === 'color'" :style="`background: ${value}; width: 32px; height: 16px;`" :for="value" class="text-gray-300"></label>
+                                <label v-if="param.label !== 'color'" :for="value" class="text-gray-300">{{ value }}</label>
                             </div>
                         </div>
                     </div>
@@ -131,17 +140,8 @@ async function getPosts() {
         </aside>
 
         <article class="w-3/4 bg-gray-100 p-4">
-            <div class="flex items-start space-x-2 bg-gray-100 p-4 text-sm text-gray-600">
-                <template v-for="breadcrumb in breadcrumbs" :key="breadcrumb.id">
-                    <div class="flex items-center">
-                        <a :href="route('client.categories.products.index', breadcrumb.id)" class="transition duration-200 hover:text-blue-500">
-                            {{ breadcrumb.title }}
-                        </a>
-                        <span class="mx-2 text-gray-400">/</span>
-                    </div>
-                </template>
-                <span class="font-semibold text-gray-800">{{ category.title }}</span>
-            </div>
+            <Breadcrumb :current="category.title" :breadcrumbs="breadcrumbs" />
+
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <ProductItem v-for="product in productsData" :product="product" :key="product.id" />
             </div>

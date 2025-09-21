@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ParamProduct;
 use App\Models\Product;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -67,52 +68,22 @@ class ProductService
 
     public static function indexByCategories(Collection $collection, array $data)
     {
-        $products = Product::byCategories($collection->pluck('id'));
-
-        if (isset($data['filters']['integer']['from']))
-        {
-            $products->whereHas('paramProducts', function ($query) use ($data)
-            {
-                foreach ($data['filters']['integer']['from'] as $key => $value)
-                {
-                    $query->where('param_id', $key)->whereRaw('CAST(value as INT) >= ?', $value);
-                }
-            });
-        }
-
-        if (isset($data['filters']['integer']['to']))
-        {
-            $products->whereHas('paramProducts', function ($query) use ($data)
-            {
-                foreach ($data['filters']['integer']['to'] as $key => $value)
-                {
-                    $query->where('param_id', $key)->whereRaw('CAST(value as INT) <= ?', $value);
-                }
-            });
-        }
-
-        if (isset($data['filters']['checkbox']))
-        {
-            $products->whereHas('paramProducts', function ($query) use ($data)
-            {
-                foreach ($data['filters']['checkbox'] as $key => $value)
-                {
-                    $query->where('param_id', $key)->whereIn('value', $value);
-                }
-            });
-        }
-
-        if (isset($data['filters']['select']))
-        {
-            $products->whereHas('paramProducts', function ($query) use ($data)
-            {
-                foreach ($data['filters']['select'] as $key => $value)
-                {
-                    $query->where('param_id', $key)->where('value', $value);
-                }
-            });
-        }
+        $products = Product::byCategories($collection->pluck('id'))->filter($data);
 
         return $products->distinct('parent_id')->get();
+    }
+
+    public static function replicate(Product $product): Product
+    {
+        $cloneProduct = $product->replicate();
+        $cloneProduct->article = fake()->randomNumber(7);
+        $cloneProduct->parent_id = $product->id;
+        $cloneProduct->push();
+
+        ImageService::replicateBatch($product, $cloneProduct);
+
+        ParamProductService::replicateBatch($product, $cloneProduct);
+
+        return $cloneProduct;
     }
 }

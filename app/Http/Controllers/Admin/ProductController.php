@@ -16,6 +16,7 @@ use App\Models\Product;
 use App\Models\ProductGroup;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as HttpResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,14 +52,13 @@ class ProductController extends Controller
         return Inertia::render('Admin/Product/Create', compact('categories', 'productGroups', 'params'));
     }
 
-    public function createChild(Product $product): Response
+    public function replicate(Product $product): JsonResponse
     {
-        $product->load(['params', 'images']);
-        $product = ProductResource::make($product)->withRelations(['images', 'params'])->resolve();
-        $categories = CategoryResource::collection(Category::all())->resolve();
-        $productGroups = ProductGroupResource::collection(ProductGroup::all())->resolve();
-        $params = ParamResource::collection(Param::all())->resolve();
-        return Inertia::render('Admin/Product/CreateChild', compact('categories', 'productGroups', 'params', 'product'));
+        $cloneProduct = ProductService::replicate($product);
+
+        return response()->json([
+            'redirect' => route('admin.products.edit', $cloneProduct->id),
+        ]);
     }
 
     public function store(StoreRequest $request): array

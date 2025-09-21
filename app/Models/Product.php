@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasFilter;
 use App\Observers\ProductObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
@@ -15,6 +17,8 @@ use Illuminate\Support\Collection;
 #[ObservedBy([ProductObserver::class])]
 class Product extends Model
 {
+    use HasFilter;
+
     protected $fillable = [
         'category_id',
         'product_group_id',
@@ -31,6 +35,11 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(Image::class, 'product_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
     public function params(): BelongsToMany
@@ -50,6 +59,11 @@ class Product extends Model
         );
     }
 
+    public function paramProducts(): HasMany
+    {
+        return $this->hasMany(ParamProduct::class, 'product_id', 'id');
+    }
+
     /**
      * Scope a query to only include popular users.
      */
@@ -59,8 +73,20 @@ class Product extends Model
         return $query->whereIn('category_id', $categoryChildrenIds)->with('images')->whereNotNull('parent_id');
     }
 
-    public function paramProducts(): HasMany
+    protected function getHasChildrenAttribute(): bool
     {
-        return $this->hasMany(ParamProduct::class, 'product_id', 'id');
+        return $this->children()->exists();
+    }
+
+    protected function getGroupedParamsAttribute(): array
+    {
+        return $this->params->groupBy('title')->map(function (Collection $param) {
+            return [
+                'id' => $param->first()->id,
+                'title' => $param->first()->title,
+                'label' => $param->first()->label,
+                'values' => $param->pluck('pivot.value')->toArray(),
+            ];
+        })->values()->toArray();
     }
 }

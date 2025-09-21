@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Product\ProductResource;
+use App\Http\Resources\Product\ProductWithGroupedParamResource;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\CategoryService;
@@ -28,5 +30,23 @@ class ProductController extends Controller
         $products = $resources->resolve();
 
         return Inertia::render('Client/Product/Index', compact('products'));
+    }
+
+    public function show(Product $product): Response
+    {
+        $product->load('images');
+        $breadcrumbs = CategoryResource::collection(
+            CategoryService::getCategoryParents($product->category)
+                ->reverse()
+                ->push($product->category)
+        )->resolve();
+
+        $resource = ProductWithGroupedParamResource::make($product);
+
+        $resource->withRelations(['images']);
+
+        $product = $resource->resolve();
+
+        return Inertia::render('Client/Product/Show', compact('product', 'breadcrumbs'));
     }
 }

@@ -10,6 +10,7 @@ class Param extends Model
     protected $fillable = [
         'title',
         'filter_type',
+        'label'
     ];
 
     protected function getFilterTypeTitleAttribute(): string

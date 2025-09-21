@@ -4,11 +4,10 @@ namespace App\Http\Resources\Product;
 
 use App\Http\Resources\BaseJsonResource;
 use App\Http\Resources\Image\ImageResource;
-use App\Http\Resources\Param\ParamResource;
 use App\Http\Resources\Param\ParamWithPivotResource;
 use Illuminate\Http\Request;
 
-class ProductResource extends BaseJsonResource
+class ProductWithGroupedParamResource extends BaseJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -34,7 +33,7 @@ class ProductResource extends BaseJsonResource
             'updated_at' => $this->updated_at,
             'images' => $this->relationLoadedOrEmpty('images', ImageResource::class),
             'preview_url' => $this->preview_url,
-            'params' => $this->relationLoadedOrEmpty('params', ParamWithPivotResource::class),
+            'params' => $this->grouped_params,
         ];
     }
 }

@@ -1,4 +1,7 @@
 export interface ProductParam {
+    id: number,
+    values: [],
+    label: string,
     param_id: number; // у тебя в данных именно param_id
     title: string;
     value: string;

@@ -30,24 +30,51 @@ async function getParentChildData(product: Product) {
     product.productsChildData = await httpRequest(route('admin.products.child.index', {product: product.id}), 'GET');
 }
 
+function replicateProduct(product: Product) {
+    httpRequest(route('admin.products.replicate', {product: product.id}), 'POST')
+        .then(response => {
+            if (response.redirect) {
+                window.location.href = response.redirect;
+            }
+        });
+}
+
 </script>
 
 <template>
-    <tr class="hover:bg-gray-50">
-        <td class="px-4 py-2 text-sm text-gray-900">{{ product.id }}</td>
+
+    <tr
+        class="hover:bg-gray-100"
+        :class="product.parent_id ? 'bg-gray-50' : 'bg-white'"
+    >
         <td class="px-4 py-2 text-sm text-gray-900">
+            {{ product.id }}
+        </td>
+
+        <td
+            class="py-2 text-sm text-gray-900 flex items-center gap-2"
+            :class="product.parent_id ? 'pl-6' : 'pl-4'"
+        >
+            <!-- Иконка-метка -->
+            <span>
+            <template v-if="!product.parent_id">👑</template>
+            <template v-else>↳</template>
+        </span>
+
             <Link :href="route('admin.products.show', product.id)">
                 {{ product.title }}
             </Link>
         </td>
+
         <td class="px-4 py-2 text-sm text-gray-900">{{ product.price }}</td>
         <td class="px-4 py-2 text-sm text-gray-900">{{ product.qty }}</td>
+
         <td class="flex items-center gap-3 px-4 py-2 text-sm text-gray-900">
-            <Link :href="route('admin.products.child.createChild', product.id)">
+            <button v-if="!product.parent_id" type="button" class="cursor-pointer" @click="replicateProduct(product)">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-            </Link>
+            </button>
             <Link :href="route('admin.products.edit', product.id)">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path
@@ -67,10 +94,17 @@ async function getParentChildData(product: Product) {
                 </svg>
             </button>
         </td>
-        <td @click.prevent="getParentChildData(product)" class="cursor-pointer px-4 py-2 text-sm text-gray-900">
-            <svg v-if="! product.parent_id" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" :d="isClosed ? 'm19.5 8.25-7.5 7.5-7.5-7.5' : 'm4.5 15.75 7.5-7.5 7.5 7.5'" />
-            </svg>
+
+        <!-- Стрелка для раскрытия (только у родителя) -->
+        <td
+            @click.prevent="getParentChildData(product)"
+            class="cursor-pointer px-4 py-2 text-sm text-gray-900"
+        >
+            <template v-if="!product.parent_id && product.has_children">
+                <span class="text-xl select-none">
+                    {{ isClosed ? '▼' : '▲' }}
+                </span>
+            </template>
         </td>
     </tr>
 </template>

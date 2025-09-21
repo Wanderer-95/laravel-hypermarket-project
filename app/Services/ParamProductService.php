@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
 
-class ImageService
+class ParamProductService
 {
     public static function storeBatch(Product $product, array $images): void
     {
@@ -22,11 +22,11 @@ class ImageService
 
     public static function replicateBatch(Product $product, Product $cloneProduct): void
     {
-        foreach ($product->images as $image)
+        foreach ($product->paramProducts as $paramProduct)
         {
-            $cloneImage = $image->replicate();
-            $cloneImage->product_id = $cloneProduct->id;
-            $cloneImage->push();
+            $cloneParamProduct = $paramProduct->replicate();
+            $cloneParamProduct->product_id = $cloneProduct->id;
+            $cloneParamProduct->push();
         }
     }
 }

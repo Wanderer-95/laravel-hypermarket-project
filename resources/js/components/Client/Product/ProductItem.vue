@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { Product } from '@/pages/Admin/Product/Types';
+import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     product: Product;
@@ -22,9 +23,11 @@ defineProps<{
 
         <!-- Контент -->
         <div class="flex flex-col flex-grow p-4">
-            <h2 class="text-lg font-semibold text-gray-900 mb-2">
-                {{ product.title }}
-            </h2>
+            <Link :href="route('client.products.show', product.id)">
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                    {{ product.title }}
+                </h2>
+            </Link>
             <p class="text-sm text-gray-600 flex-grow">
                 {{ product.description }}
             </p>

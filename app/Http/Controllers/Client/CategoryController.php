@@ -8,7 +8,6 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Param\ParamWithValuesResource;
 use App\Http\Resources\Product\ProductResource;
 use App\Models\Category;
-use App\Models\Product;
 use App\Services\CategoryService;
 use App\Services\ParamService;
 use App\Services\ProductService;
@@ -18,13 +17,20 @@ use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    public function index(): Response
+    {
+        $categories = CategoryResource::collection(Category::query()->whereNull('parent_id')->get())->resolve();
+
+        return Inertia::render('Client/Category/Index', compact('categories'));
+    }
+
     public function productsIndex(Category $category, ProductIndexRequest $request): Response|Collection|array
     {
         $data = $request->validated();
 
         $categoryChildrenIds = CategoryService::getCategoryChildren($category);
         $resources = ProductResource::collection(ProductService::indexByCategories($categoryChildrenIds, $data));
-
+        $categoryChildren = CategoryResource::collection($category->categories)->resolve();
         // применяем withRelations к каждому ресурсу
 
         foreach ($resources as $resource) {
@@ -42,6 +48,6 @@ class CategoryController extends Controller
         $breadcrumbs = CategoryResource::collection(CategoryService::getCategoryParents($category)->reverse())->resolve();
         $category = CategoryResource::make($category)->resolve();
 
-        return Inertia::render('Client/Category/ProductIndex', compact('category', 'products', 'breadcrumbs', 'params'));
+        return Inertia::render('Client/Category/ProductIndex', compact('category', 'categoryChildren', 'products', 'breadcrumbs', 'params'));
     }
 }

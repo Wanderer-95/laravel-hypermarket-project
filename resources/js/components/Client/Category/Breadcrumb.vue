@@ -12,6 +12,10 @@ defineProps<{
 
 <template>
     <div class="flex items-start space-x-2 bg-gray-100 p-4 text-sm text-gray-600">
+        <Link :href="route('client.categories.index')">
+            Категории
+        </Link>
+        <span class="mx-2 text-gray-400">/</span>
         <template v-for="breadcrumb in breadcrumbs" :key="breadcrumb.id">
             <div class="flex itemsц-center">
                 <Link :href="route('client.categories.products.index', breadcrumb.id)">

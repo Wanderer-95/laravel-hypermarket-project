@@ -13,6 +13,7 @@ import Breadcrumb from '@/components/Client/Category/Breadcrumb.vue';
 const props = defineProps<{
     products: Product[];
     breadcrumbs: Category[];
+    categoryChildren: Category[];
     category: Category;
     params: Param[];
 }>();
@@ -84,6 +85,39 @@ async function getPosts() {
         {{ filters }}
         <aside class="min-h-screen w-1/4 bg-gray-900 p-6">
             <nav class="space-y-6 rounded-xl bg-gray-800 p-4">
+
+                <div class="mb-4 pb-4 border-b border-b-gray-600">
+                    <div>
+                        <h3 class="text-white mb-2">Категории</h3>
+                    </div>
+                    <div>
+                        <div v-if="breadcrumbs.length > 0" class="flex items-center space-x-2 text-sm text-gray-600">
+                            <template v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id">
+                                <Link
+                                    :href="route('client.categories.products.index', breadcrumb.id)"
+                                    class="text-blue-600 hover:underline transition duration-150 ease-in-out"
+                                >
+                                    {{ breadcrumb.title }}
+                                </Link>
+
+                                <!-- Показывать " / " разделитель, кроме последнего элемента -->
+                                <span v-if="index < breadcrumbs.length - 1" class="text-gray-400">/</span>
+                            </template>
+                        </div>
+                        <div v-if="categoryChildren.length > 0" class="flex items-center space-x-2 text-sm text-gray-600">
+                            <template v-for="categoryChild in categoryChildren" :key="categoryChild.id">
+                                <Link
+                                    :href="route('client.categories.products.index', categoryChild.id)"
+                                    class="text-blue-600 hover:underline transition duration-150 ease-in-out"
+                                >
+                                    {{ categoryChild.title }}
+                                </Link>
+                            </template>
+                        </div>
+                    </div>
+
+                </div>
+
                 <template v-for="param in params">
                     <!-- Чекбоксы -->
                     <div v-if="param.filter_type === 3" :key="param.id">

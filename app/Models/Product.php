@@ -42,6 +42,26 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'parent_id', 'id');
+    }
+
+    public function siblingProducts(): HasMany
+    {
+        return $this->parent->children();
+    }
+
+    public function productGroup(): BelongsTo
+    {
+        return $this->belongsTo(ProductGroup::class, 'product_group_id', 'id');
+    }
+
+    public function getGroupProductsAttribute(): Collection
+    {
+        return $this->productGroup->products()->whereNot('parent_id', $this->parent_id)->distinct('parent_id')->get();
+    }
+
     public function params(): BelongsToMany
     {
         return $this->belongsToMany(Param::class, 'param_product', 'product_id', 'param_id')->withPivot('value');

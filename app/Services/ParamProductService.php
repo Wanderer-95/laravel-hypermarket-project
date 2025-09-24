@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ParamProduct;
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
 
@@ -28,5 +29,17 @@ class ParamProductService
             $cloneParamProduct->product_id = $cloneProduct->id;
             $cloneParamProduct->push();
         }
+    }
+
+    public static function getGroupedByParamsArray(Product $product): array
+    {
+        return ParamProduct::query()->groupedByParams($product)->get()
+            ->groupBy('param_id')
+            ->map(function ($paramProductItem) {
+                return [
+                    'title' => $paramProductItem->first()->title,
+                    'data' => $paramProductItem->toArray()
+                ];
+            })->values()->toArray();
     }
 }

@@ -7,8 +7,10 @@ use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductWithGroupedParamResource;
 use App\Models\Category;
+use App\Models\ParamProduct;
 use App\Models\Product;
 use App\Services\CategoryService;
+use App\Services\ParamProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -41,12 +43,14 @@ class ProductController extends Controller
                 ->push($product->category)
         )->resolve();
 
+        $paramProducts = ParamProductService::getGroupedByParamsArray($product);
+
         $resource = ProductWithGroupedParamResource::make($product);
 
         $resource->withRelations(['images']);
 
         $product = $resource->resolve();
 
-        return Inertia::render('Client/Product/Show', compact('product', 'breadcrumbs'));
+        return Inertia::render('Client/Product/Show', compact('product', 'breadcrumbs', 'paramProducts'));
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Resources\Product;
 
 use App\Http\Resources\BaseJsonResource;
 use App\Http\Resources\Image\ImageResource;
-use App\Http\Resources\Param\ParamWithPivotResource;
 use Illuminate\Http\Request;
 
 class ProductWithGroupedParamResource extends BaseJsonResource
@@ -20,6 +19,7 @@ class ProductWithGroupedParamResource extends BaseJsonResource
             'id' => $this->id,
             'article' => $this->article,
             'product_group_id' => $this->product_group_id,
+            'group_products' => ProductResource::collection($this->group_products)->resolve(),
             'parent_id' => $this->parent_id,
             'category_id' => $this->category_id,
             'title' => $this->title,

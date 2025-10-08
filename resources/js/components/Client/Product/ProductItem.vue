@@ -2,6 +2,7 @@
 
 import { Product } from '@/pages/Admin/Product/Types';
 import { Link } from '@inertiajs/vue3';
+import StoreOrUpdateCart from '@/components/Client/Cart/StoreOrUpdateCart.vue';
 
 defineProps<{
     product: Product;
@@ -42,11 +43,7 @@ defineProps<{
             </div>
 
             <div class="mt-4 flex items-center justify-between">
-                <button
-                    class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
-                >
-                    Купить
-                </button>
+                <StoreOrUpdateCart :product="product" />
             </div>
         </div>
     </div>

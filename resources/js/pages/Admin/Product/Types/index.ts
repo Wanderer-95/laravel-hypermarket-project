@@ -1,3 +1,5 @@
+import { Cart } from '@/pages/Client/Cart/types';
+
 export interface ProductParam {
     id: number,
     values: [],
@@ -27,6 +29,7 @@ export interface Product {
     updated_at: string;
     article: string;
     images: ProductImage[];      // ✅ массив изображений
+    cart: Cart;      // ✅ массив изображений
     params: ProductParam[];      // ✅ массив параметров
     group_products: Product[];      // ✅ массив параметров
     preview_url: string;      // ✅ массив параметров

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Product;
 
 use App\Http\Resources\BaseJsonResource;
+use App\Http\Resources\Cart\CartResource;
 use App\Http\Resources\Image\ImageResource;
 use App\Http\Resources\Param\ParamResource;
 use App\Http\Resources\Param\ParamWithPivotResource;
@@ -29,6 +30,7 @@ class ProductResource extends BaseJsonResource
             'price' => $this->price,
             'has_children' => $this->has_children,
             'old_price' => $this->old_price,
+            'cart' => $this->cart ? CartResource::make($this->cart)->resolve() : null,
             'qty' => $this->qty,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

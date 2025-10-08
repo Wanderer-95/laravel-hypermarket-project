@@ -7,6 +7,7 @@ use App\Http\Requests\Client\Category\ProductIndexRequest;
 use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Param\ParamWithValuesResource;
 use App\Http\Resources\Product\ProductResource;
+use App\Mappers\Client\CategoryMapper;
 use App\Models\Category;
 use App\Services\CategoryService;
 use App\Services\ParamService;
@@ -28,26 +29,11 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
 
-        $categoryChildrenIds = CategoryService::getCategoryChildren($category);
-        $resources = ProductResource::collection(ProductService::indexByCategories($categoryChildrenIds, $data));
-        $categoryChildren = CategoryResource::collection($category->categories)->resolve();
-        // применяем withRelations к каждому ресурсу
-
-        foreach ($resources as $resource) {
-            $resource->withRelations(['images']);
-        }
-
-        $products = $resources->resolve();
-
         if ($request->wantsJson())
         {
-            return $products;
+            return CategoryMapper::productsIndexAsJson($category, $data);
         }
 
-        $params = ParamWithValuesResource::collection(ParamService::indexByCategories($categoryChildrenIds))->resolve();
-        $breadcrumbs = CategoryResource::collection(CategoryService::getCategoryParents($category)->reverse())->resolve();
-        $category = CategoryResource::make($category)->resolve();
-
-        return Inertia::render('Client/Category/ProductIndex', compact('category', 'categoryChildren', 'products', 'breadcrumbs', 'params'));
+        return Inertia::render('Client/Category/ProductIndex', CategoryMapper::productsIndex($category, $data));
     }
 }

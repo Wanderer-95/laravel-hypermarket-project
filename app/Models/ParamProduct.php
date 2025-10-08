@@ -33,7 +33,9 @@ class ParamProduct extends Model
     #[Scope]
     protected function groupedByParams(Builder $builder, Product $product): Builder
     {
-        return $builder->whereIn('product_id', $product->siblingProducts->pluck('id'))
+        return $builder->whereHas('param', function ($b) {
+            return $b->where('is_show_in_card', true);
+        })->whereIn('product_id', $product->siblingProducts->pluck('id'))
             ->with('param');
     }
 }

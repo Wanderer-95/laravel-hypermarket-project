@@ -3,12 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
     protected $fillable = [
-        'total_price',
         'status',
-        'user_id',
+        'user_id'
     ];
+
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class, 'order_id', 'id');
+    }
 }

@@ -12,12 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
 #[ObservedBy([ProductObserver::class])]
 class Product extends Model
 {
     use HasFilter;
+
+    protected $with = ['cart'];
 
     protected $fillable = [
         'category_id',
@@ -40,6 +43,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class, 'product_id', 'id')->where('user_id', auth()->id())->whereNull('order_id');
     }
 
     public function parent(): BelongsTo
@@ -75,7 +83,7 @@ class Product extends Model
     public function previewUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->images()->first()->url ?? null
+            get: fn () => $this->images->first()->url ?? null
         );
     }
 
@@ -90,12 +98,12 @@ class Product extends Model
     #[Scope]
     protected function byCategories(Builder $query, Collection $categoryChildrenIds): Builder
     {
-        return $query->whereIn('category_id', $categoryChildrenIds)->with('images')->whereNotNull('parent_id');
+        return $query->whereIn('category_id', $categoryChildrenIds)->whereNotNull('parent_id')->with(['cart', 'images', 'children']);
     }
 
     protected function getHasChildrenAttribute(): bool
     {
-        return $this->children()->exists();
+        return $this->children->contains('id', $this->id);
     }
 
     protected function getGroupedParamsAttribute(): array
